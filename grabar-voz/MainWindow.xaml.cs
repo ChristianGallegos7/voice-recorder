@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
 using System.Windows.Threading;
+using Azure.Storage.Blobs;
 using NAudio.Wave;
 
 namespace grabar_voz
@@ -17,6 +19,7 @@ namespace grabar_voz
         {
             InitializeComponent();
             ConfigurarTimer();
+            MostrarDispositivosDeAudio();
         }
 
         private void ConfigurarTimer()
@@ -40,11 +43,14 @@ namespace grabar_voz
             writer?.Write(e.Buffer, 0, e.BytesRecorded);
         }
 
-        private void WaveIn_RecordingStopped(object sender, StoppedEventArgs e)
+        private async void WaveIn_RecordingStopped(object sender, StoppedEventArgs e)
         {
             writer?.Dispose();
             waveIn?.Dispose();
             MessageBox.Show($"Grabación guardada en: {outputFilePath}");
+
+            // Subir a Azure
+            await SubirArchivoAzure(outputFilePath);
         }
 
         private void StartRecording_Click(object sender, RoutedEventArgs e)
@@ -98,6 +104,40 @@ namespace grabar_voz
             {
                 var capabilities = WaveInEvent.GetCapabilities(i);
                 MessageBox.Show($"Dispositivo {i}: {capabilities.ProductName}");
+            }
+        }
+
+        public async Task SubirArchivoAzure(string rutaArchivo)
+        {
+            string connectionString = "DefaultEndpointsProtocol=https;AccountName=mi-cuenta;AccountKey=mi-clave;EndpointSuffix=core.windows.net";
+            string containerName = "grabaciones";
+
+            try
+            {
+                //crear cliente de blob
+                BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+                //crear el contenedor
+                BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+                await containerClient.CreateIfNotExistsAsync();
+
+
+                // Nombre del blob
+                string blobName = Path.GetFileName(rutaArchivo);
+                BlobClient blobClient = containerClient.GetBlobClient(blobName);
+            
+                //Subir archivos
+                using(FileStream uploadFileStream = File.OpenRead(rutaArchivo))
+                {
+                    await blobClient.UploadAsync(uploadFileStream, overwrite: true);
+                }
+
+                MessageBox.Show("Archivo subido exitosamente a Azure");
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show($"Error al subir archivo: {ex.Message}");
             }
         }
     }
