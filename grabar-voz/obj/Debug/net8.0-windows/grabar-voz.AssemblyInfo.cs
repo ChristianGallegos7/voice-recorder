@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("grabar-voz")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3677969271b95cb7dfe88be1a6bf0c95ed886963")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d8303679a6672ffa6d4d19514118823811238170")]
 [assembly: System.Reflection.AssemblyProductAttribute("grabar-voz")]
 [assembly: System.Reflection.AssemblyTitleAttribute("grabar-voz")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
