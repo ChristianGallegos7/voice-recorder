@@ -1,6 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Threading;
 using NAudio.Wave;
 
 namespace grabar_voz
@@ -11,9 +10,29 @@ namespace grabar_voz
         private WaveFileWriter writer;
         private string outputFilePath;
 
+        private DispatcherTimer timer; // Temporizador para el tiempo transcurrido
+        private TimeSpan elapsedTime;  // Tiempo acumulado
+
         public MainWindow()
         {
             InitializeComponent();
+            ConfigurarTimer();
+        }
+
+        private void ConfigurarTimer()
+        {
+            timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1) // Actualización cada segundo
+            };
+            timer.Tick += Timer_Tick;
+            elapsedTime = TimeSpan.Zero;
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            elapsedTime = elapsedTime.Add(TimeSpan.FromSeconds(1));
+            TimerTextBlock.Text = elapsedTime.ToString(@"mm\:ss");
         }
 
         private void WaveIn_DataAvailable(object sender, WaveInEventArgs e)
@@ -47,6 +66,11 @@ namespace grabar_voz
                 waveIn.DataAvailable += WaveIn_DataAvailable;
                 waveIn.RecordingStopped += WaveIn_RecordingStopped;
                 waveIn.StartRecording();
+
+                // Reiniciar y arrancar el temporizador
+                elapsedTime = TimeSpan.Zero;
+                TimerTextBlock.Text = "00:00";
+                timer.Start();
                 MessageBox.Show("Grabación iniciada");
             }
             catch (Exception ex)
@@ -57,6 +81,7 @@ namespace grabar_voz
 
         private void StopRecording_Click(object sender, RoutedEventArgs e)
         {
+            timer.Stop(); // Detener el temporizador
             waveIn?.StopRecording();
         }
 
