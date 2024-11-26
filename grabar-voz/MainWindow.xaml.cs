@@ -26,6 +26,16 @@ namespace grabar_voz
             MostrarDispositivosDeAudio();
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Obtener el área de trabajo (excluyendo la barra de tareas)
+            var workArea = SystemParameters.WorkArea;
+
+            // Establecer la posición de la ventana en la esquina inferior derecha
+            this.Left = workArea.Right - this.Width; // Derecha de la pantalla
+            this.Top = workArea.Bottom - this.Height; // Abajo de la pantalla
+        }
+
         private void ConfigurarTimer()
         {
             timer = new DispatcherTimer

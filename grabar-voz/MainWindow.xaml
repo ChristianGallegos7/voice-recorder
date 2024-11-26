@@ -9,7 +9,9 @@
         WindowStyle="None"
         Topmost="True"
         AllowsTransparency="True"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+         Loaded="Window_Loaded"
+        >
 
     <Window.Resources>
         <!-- Estilos de botones -->
@@ -35,20 +37,26 @@
                                 <ContentPresenter HorizontalAlignment="Center" 
                                                   VerticalAlignment="Center"/>
                             </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#3498DB"/>
-                                    <!-- Azul más claro -->
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter Property="Background" Value="#1ABC9C"/>
-                                    <!-- Celeste -->
-                                </Trigger>
-                            </ControlTemplate.Triggers>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+
+            <!-- Triggers fuera del Template -->
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3498DB"/>
+                    <!-- Azul más claro -->
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#1ABC9C"/>
+                    <!-- Celeste -->
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#BDC3C7"/>
+                    <!-- Gris para deshabilitado -->
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <!-- Estilo del TextBlock (temporizador) -->
