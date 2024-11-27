@@ -5,7 +5,7 @@
         Height="180" 
         Width="300"
         Background="#121212" 
-    WindowStartupLocation="Manual"
+        WindowStartupLocation="Manual"
         WindowStyle="SingleBorderWindow"
         Topmost="True"
         ResizeMode="NoResize"
@@ -13,21 +13,20 @@
 
     <Window.Resources>
         <!-- Colores dinámicos para los botones -->
-        <SolidColorBrush x:Key="RecordingColor" Color="#FF2D2D"/>
-        <!-- Rojo oscuro -->
+        <SolidColorBrush x:Key="RecordingColor" Color="#D32F2F"/>
+        <!-- Rojo brillante -->
         <SolidColorBrush x:Key="PausedColor" Color="#FFEB3B"/>
         <!-- Amarillo vibrante -->
-        <SolidColorBrush x:Key="StoppedColor" Color="#4CAF50"/>
-        <!-- Verde oscuro -->
-        <SolidColorBrush x:Key="ButtonDefaultColor" Color="#1E2A47"/>
-        <!-- Azul oscuro -->
+        <SolidColorBrush x:Key="StoppedColor" Color="#388E3C"/>
+        <!-- Verde vibrante -->
+        <SolidColorBrush x:Key="ButtonDefaultColor" Color="#1976D2"/>
+        <!-- Azul brillante -->
 
         <!-- Estilo para el texto del temporizador -->
         <Style x:Key="TimerStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="24"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
-            <!-- Texto blanco -->
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
 
@@ -58,16 +57,16 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#2C3E50"/>
-                    <!-- Azul oscuro -->
+                    <Setter Property="Background" Value="#1565C0"/>
+                    <!-- Azul más brillante -->
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#34495E"/>
-                    <!-- Azul más oscuro -->
+                    <Setter Property="Background" Value="#0D47A1"/>
+                    <!-- Azul oscuro -->
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#BDC3C7"/>
-                    <!-- Gris claro cuando deshabilitado -->
+                    <Setter Property="Background" Value="#212121"/>
+                    <!-- Gris oscuro para deshabilitado -->
                 </Trigger>
             </Style.Triggers>
         </Style>

@@ -30,6 +30,7 @@ namespace grabar_voz
             isStopped = false;
             UpdateButtonStates();
         }
+
         private void UpdateButtonStates()
         {
             if (!isRecording && !isPaused) // Estado inicial o después de detener
@@ -74,8 +75,11 @@ namespace grabar_voz
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            elapsedTime = elapsedTime.Add(TimeSpan.FromSeconds(1));
-            TimerTextBlock.Text = elapsedTime.ToString(@"mm\:ss");
+            if (isRecording || isPaused)
+            {
+                elapsedTime = elapsedTime.Add(TimeSpan.FromSeconds(1));
+                TimerTextBlock.Text = elapsedTime.ToString(@"mm\:ss");
+            }
         }
 
         private void WaveIn_DataAvailable(object sender, WaveInEventArgs e)
@@ -96,7 +100,7 @@ namespace grabar_voz
                 isStopped = false; // Resetear la bandera
             }
         }
-        
+
         private void PauseRecording_Click(object sender, RoutedEventArgs e)
         {
             if (isRecording && !isPaused) // Si está grabando y no pausado
@@ -133,8 +137,11 @@ namespace grabar_voz
                 waveIn.RecordingStopped += WaveIn_RecordingStopped;
                 waveIn.StartRecording();
 
-                elapsedTime = TimeSpan.Zero;
-                TimerTextBlock.Text = "00:00";
+                if (!isPaused) // Solo reiniciar el tiempo si no se está reanudando
+                {
+                    elapsedTime = TimeSpan.Zero;
+                    TimerTextBlock.Text = "00:00";
+                }
                 timer.Start();
 
                 isRecording = true;
@@ -147,6 +154,7 @@ namespace grabar_voz
                 MessageBox.Show($"Error al iniciar grabación: {ex.Message}");
             }
         }
+
         private async void StopRecording_Click(object sender, RoutedEventArgs e)
         {
             if (isRecording || isPaused) // Si está grabando o pausado
@@ -159,8 +167,6 @@ namespace grabar_voz
                 isStopped = true; // Marcar como detenido
                 UpdateButtonStates();
 
-                MessageBox.Show("Grabación detenida");
-
                 // Guardar y subir el archivo
                 writer?.Dispose();
                 waveIn?.Dispose();
@@ -168,8 +174,6 @@ namespace grabar_voz
                 await SubirArchivoAzure(outputFilePath);
             }
         }
-
-
 
         private bool HayMicrofonosDisponibles()
         {
@@ -201,19 +205,11 @@ namespace grabar_voz
                     await blobClient.UploadAsync(uploadFileStream, overwrite: true);
                 }
 
-                MessageBox.Show("Archivo subido exitosamente a Azure");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al subir archivo: {ex.Message}");
+                MessageBox.Show($"Error al subir archivo a Azure: {ex.Message}");
             }
         }
-
-        
-
-
-
-       
-
     }
 }
