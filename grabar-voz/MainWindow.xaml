@@ -4,23 +4,43 @@
         Title="Grabar Voz"
         Height="180" 
         Width="300"
-        Background="#F0F4F8"
-        WindowStartupLocation="Manual"
+        Background="#121212" 
+    WindowStartupLocation="Manual"
         WindowStyle="SingleBorderWindow"
         Topmost="True"
         ResizeMode="NoResize"
         Loaded="Window_Loaded">
 
     <Window.Resources>
+        <!-- Colores dinámicos para los botones -->
+        <SolidColorBrush x:Key="RecordingColor" Color="#FF2D2D"/>
+        <!-- Rojo oscuro -->
+        <SolidColorBrush x:Key="PausedColor" Color="#FFEB3B"/>
+        <!-- Amarillo vibrante -->
+        <SolidColorBrush x:Key="StoppedColor" Color="#4CAF50"/>
+        <!-- Verde oscuro -->
+        <SolidColorBrush x:Key="ButtonDefaultColor" Color="#1E2A47"/>
+        <!-- Azul oscuro -->
+
+        <!-- Estilo para el texto del temporizador -->
+        <Style x:Key="TimerStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <!-- Texto blanco -->
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Estilo para los botones -->
         <Style x:Key="ButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="60"/>
             <Setter Property="Height" Value="60"/>
             <Setter Property="Margin" Value="10"/>
-            <Setter Property="Background" Value="#FF69B4"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="{StaticResource ButtonDefaultColor}"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -30,61 +50,58 @@
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="2"
                                     CornerRadius="10">
-                                <ContentPresenter HorizontalAlignment="Center" 
-                                                  VerticalAlignment="Center"/>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FFB6C1"/>
+                    <Setter Property="Background" Value="#2C3E50"/>
+                    <!-- Azul oscuro -->
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#FF1493"/>
+                    <Setter Property="Background" Value="#34495E"/>
+                    <!-- Azul más oscuro -->
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Background" Value="#BDC3C7"/>
+                    <!-- Gris claro cuando deshabilitado -->
                 </Trigger>
             </Style.Triggers>
-        </Style>
-
-        <Style x:Key="TimerStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="#FF69B4"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
     </Window.Resources>
 
     <Grid>
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical" Margin="10">
+            <!-- Temporizador con texto blanco -->
             <TextBlock Name="TimerTextBlock"
                        Text="00:00"
                        Style="{StaticResource TimerStyle}"
                        Margin="0,0,0,10"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <!-- Botón de Pausa -->
                 <Button Name="PauseRecording"
                         Click="PauseRecording_Click" 
                         Style="{StaticResource ButtonStyle}"
                         IsEnabled="False">
-                    <Image Stretch="Uniform" Source="/pausa-icon.png" Width="28" Height="28"/>
+                    <Image Stretch="Uniform" Source="/pausar.png" Width="28" Height="28"/>
                 </Button>
 
+                <!-- Botón de Grabar -->
                 <Button Name="StartRecording"
                         Click="StartRecording_Click" 
                         Style="{StaticResource ButtonStyle}">
-                    <Image Stretch="Uniform" Source="/grabar-icon.png" Width="28" Height="28"/>
+                    <Image Stretch="Uniform" Source="/iniciar.png" Width="28" Height="28"/>
                 </Button>
 
+                <!-- Botón de Detener -->
                 <Button Name="StopRecording"
                         Click="StopRecording_Click" 
-                        Style="{StaticResource ButtonStyle}" 
-                        Background="#FF1493">
-                    <Image Source="/guardar-icon.png" Stretch="Uniform" Width="28" Height="28"/>
+                        Style="{StaticResource ButtonStyle}">
+                    <Image Source="/detener.png" Stretch="Uniform" Width="28" Height="28"/>
                 </Button>
             </StackPanel>
         </StackPanel>

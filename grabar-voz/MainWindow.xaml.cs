@@ -23,7 +23,33 @@ namespace grabar_voz
         {
             InitializeComponent();
             ConfigurarTimer();
-            //MostrarDispositivosDeAudio();
+
+            // Establecer estados iniciales
+            isRecording = false;
+            isPaused = false;
+            isStopped = false;
+            UpdateButtonStates();
+        }
+        private void UpdateButtonStates()
+        {
+            if (!isRecording && !isPaused) // Estado inicial o después de detener
+            {
+                StartRecording.IsEnabled = true;  // Habilitado para iniciar grabación
+                PauseRecording.IsEnabled = false; // No se puede pausar
+                StopRecording.IsEnabled = false;  // No se puede detener
+            }
+            else if (isRecording && !isPaused) // Grabando
+            {
+                StartRecording.IsEnabled = false; // No se puede iniciar mientras graba
+                PauseRecording.IsEnabled = true;  // Habilitado para pausar
+                StopRecording.IsEnabled = true;  // Habilitado para detener
+            }
+            else if (isPaused) // Pausado
+            {
+                StartRecording.IsEnabled = true;  // Habilitado para reanudar
+                PauseRecording.IsEnabled = false; // No se puede pausar mientras está pausado
+                StopRecording.IsEnabled = true;  // Habilitado para detener
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -70,6 +96,23 @@ namespace grabar_voz
                 isStopped = false; // Resetear la bandera
             }
         }
+        
+        private void PauseRecording_Click(object sender, RoutedEventArgs e)
+        {
+            if (isRecording && !isPaused) // Si está grabando y no pausado
+            {
+                waveIn.StopRecording(); // Pausar grabación
+                timer.Stop();           // Detener el temporizador
+                isPaused = true;
+            }
+            else if (isPaused) // Si está pausado
+            {
+                waveIn.StartRecording(); // Reanudar grabación
+                timer.Start();           // Reanudar el temporizador
+                isPaused = false;
+            }
+            UpdateButtonStates(); // Actualizar estados de botones
+        }
 
         private void StartRecording_Click(object sender, RoutedEventArgs e)
         {
@@ -94,48 +137,45 @@ namespace grabar_voz
                 TimerTextBlock.Text = "00:00";
                 timer.Start();
 
-                // Actualizar estados
                 isRecording = true;
                 isPaused = false;
                 isStopped = false;
                 UpdateButtonStates();
-                MessageBox.Show("Grabación iniciada");
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error al iniciar grabación: {ex.Message}");
             }
         }
-
-        private void StopRecording_Click(object sender, RoutedEventArgs e)
+        private async void StopRecording_Click(object sender, RoutedEventArgs e)
         {
-            if (isRecording)
+            if (isRecording || isPaused) // Si está grabando o pausado
             {
                 waveIn.StopRecording(); // Detener grabación
-                timer.Stop();
+                timer.Stop();           // Detener el temporizador
+
                 isRecording = false;
                 isPaused = false;
-                isStopped = true;  // Marcar como detenido
+                isStopped = true; // Marcar como detenido
                 UpdateButtonStates();
+
                 MessageBox.Show("Grabación detenida");
+
+                // Guardar y subir el archivo
+                writer?.Dispose();
+                waveIn?.Dispose();
+                TimerTextBlock.Text = "00:00";
+                await SubirArchivoAzure(outputFilePath);
             }
         }
+
+
 
         private bool HayMicrofonosDisponibles()
         {
             // Verificar si hay dispositivos de entrada de audio
             return WaveInEvent.DeviceCount > 0;
         }
-
-        // Método adicional para mostrar dispositivos de audio disponibles
-        //private void MostrarDispositivosDeAudio()
-        //{
-        //    for (int i = 0; i < WaveInEvent.DeviceCount; i++)
-        //    {
-        //        var capabilities = WaveInEvent.GetCapabilities(i);
-        //        MessageBox.Show($"Dispositivo {i}: {capabilities.ProductName}");
-        //    }
-        //}
 
         public async Task SubirArchivoAzure(string rutaArchivo)
         {
@@ -169,32 +209,11 @@ namespace grabar_voz
             }
         }
 
-        private void PauseRecording_Click(object sender, RoutedEventArgs e)
-        {
-            if (isRecording && !isPaused)
-            {
-                waveIn.StopRecording(); // Pausar grabación6
-                timer.Stop(); // Detener el temporizador
-                isPaused = true;
-                UpdateButtonStates();
-                MessageBox.Show("Grabación pausada");
-            }
-            else if (isRecording && isPaused)
-            {
-                waveIn.StartRecording(); // Reanudar grabación
-                timer.Start(); // Reanudar temporizador
-                isPaused = false;
-                UpdateButtonStates();
-                MessageBox.Show("Grabación reanudada");
-            }
-        }
+        
 
-        private void UpdateButtonStates()
-        {
-            StartRecording.IsEnabled = !isRecording; // Desactivar al grabar
-            PauseRecording.IsEnabled = isRecording; // Activar al grabar
-            StopRecording.IsEnabled = isRecording; // Activar al grabar
-        }
+
+
+       
 
     }
 }

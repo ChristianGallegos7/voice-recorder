@@ -10,9 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="detener.png" />
     <None Remove="grabar-icon.png" />
     <None Remove="guardar-icon.png" />
+    <None Remove="iniciar.png" />
     <None Remove="pausa-icon.png" />
+    <None Remove="pausar.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,9 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="detener.png" />
     <Resource Include="grabar-icon.png" />
     <Resource Include="guardar-icon.png" />
+    <Resource Include="iniciar.png" />
     <Resource Include="pausa-icon.png" />
+    <Resource Include="pausar.png" />
   </ItemGroup>
 
 </Project>
