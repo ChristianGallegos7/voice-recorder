@@ -1,7 +1,9 @@
 ﻿using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 using Azure.Storage.Blobs;
+using NAudio.Dsp;
 using NAudio.Wave;
 
 namespace grabar_voz
@@ -11,7 +13,8 @@ namespace grabar_voz
         private WaveInEvent waveIn;
         private WaveFileWriter writer;
         private string outputFilePath;
-
+        private Complex[] fftBuffer; // Buffer para los datos de FFT
+        private int fftSize = 1024; // Tamaño de la FFT (puedes ajustarlo)
         private DispatcherTimer timer; // Temporizador para el tiempo transcurrido
         private TimeSpan elapsedTime;  // Tiempo acumulado
 
@@ -23,6 +26,7 @@ namespace grabar_voz
         {
             InitializeComponent();
             ConfigurarTimer();
+            fftBuffer = new Complex[fftSize];
 
             // Establecer estados iniciales
             isRecording = false;
@@ -61,6 +65,10 @@ namespace grabar_voz
             // Establecer la posición de la ventana en la esquina inferior derecha
             this.Left = workArea.Right - this.Width; // Derecha de la pantalla
             this.Top = workArea.Bottom - this.Height; // Abajo de la pantalla
+
+            // Asegúrate de que el Canvas esté en la fila correcta
+            Grid.SetRow(SpectrumCanvas, 0);
+            SpectrumCanvas.VerticalAlignment = VerticalAlignment.Top;
         }
 
         private void ConfigurarTimer()
@@ -84,9 +92,55 @@ namespace grabar_voz
 
         private void WaveIn_DataAvailable(object sender, WaveInEventArgs e)
         {
-            writer?.Write(e.Buffer, 0, e.BytesRecorded);
+            if (isPaused || writer == null) return;
+
+            writer.Write(e.Buffer, 0, e.BytesRecorded);
+
+            // Copiar los datos en el buffer FFT
+            int bytesRecorded = e.BytesRecorded;
+            for (int i = 0; i < fftSize && i < bytesRecorded / 2; i++)
+            {
+                // Normalizar los valores de audio para que estén en el rango -1.0 a 1.0
+                fftBuffer[i].X = (float)(BitConverter.ToInt16(e.Buffer, i * 2)) / 32768f;
+                fftBuffer[i].Y = 0; // Imaginario siempre es cero
+            }
+
+            // Realizar la FFT
+            FastFourierTransform.FFT(true, (int)Math.Log(fftSize, 2), fftBuffer);
+
+            // Llamar a un método para actualizar el espectro en la UI
+            UpdateSpectrum();
         }
 
+        private void UpdateSpectrum()
+        {
+            // Obtener las magnitudes de la FFT y calcular el nivel de cada frecuencia
+            var magnitudes = fftBuffer.Take(fftSize / 2)
+                .Select(c => 20 * Math.Log10(Math.Sqrt(c.X * c.X + c.Y * c.Y))) // Convertir a dB usando la magnitud
+                .ToArray();
+
+            // Usar Dispatcher para asegurarse de que se ejecute en el hilo de la UI
+            SpectrumCanvas.Dispatcher.Invoke(() =>
+            {
+                // Limpiar el Canvas antes de dibujar
+                SpectrumCanvas.Children.Clear();
+
+                // Dibujar barras de frecuencia
+                for (int i = 0; i < magnitudes.Length; i++)
+                {
+                    double height = Math.Min(magnitudes[i], 20); // Limitar la altura para no sobrecargar la UI
+                    var rect = new System.Windows.Shapes.Rectangle
+                    {
+                        Width = 2,
+                        Height = 2,
+                        Fill = System.Windows.Media.Brushes.Green
+                    };
+                    Canvas.SetLeft(rect, i * 3); // Espaciado entre las barras
+                    Canvas.SetTop(rect, 100 - height); // Posición en el eje Y (invertido, ya que el 0 está en la parte superior)
+                    SpectrumCanvas.Children.Add(rect);
+                }
+            });
+        }
         private async void WaveIn_RecordingStopped(object sender, StoppedEventArgs e)
         {
             try
@@ -98,7 +152,6 @@ namespace grabar_voz
                     outputFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\Grabacion_{DateTime.Now:yyyyMMdd_HHmmss}.wav";
                     MessageBox.Show($"Guardando archivo en: {outputFilePath}");
 
-
                     // Subir a Azure
                     await SubirArchivoAzure(outputFilePath);
                     isStopped = false; // Resetear la bandera
@@ -109,7 +162,6 @@ namespace grabar_voz
                 MessageBox.Show($"Error en WaveIn_RecordingStopped: {ex.Message}");
             }
         }
-
 
         private void PauseRecording_Click(object sender, RoutedEventArgs e)
         {
@@ -147,6 +199,9 @@ namespace grabar_voz
                 waveIn.RecordingStopped += WaveIn_RecordingStopped;
                 waveIn.StartRecording();
 
+                // Inicializar el buffer FFT
+                fftBuffer = new Complex[fftSize];
+
                 if (!isPaused) // Solo reiniciar el tiempo si no se está reanudando
                 {
                     elapsedTime = TimeSpan.Zero;
@@ -178,16 +233,15 @@ namespace grabar_voz
                 UpdateButtonStates();
 
                 // Asegurarse de que la grabación se haya detenido
-                MessageBox.Show("Grabación detenida. Guardando...");
+                //MessageBox.Show("Grabación detenida. Guardando...");
 
                 // Guardar y subir el archivo
                 writer?.Dispose();
                 waveIn?.Dispose();
                 TimerTextBlock.Text = "00:00";
-                await SubirArchivoAzure(outputFilePath);
+                //await SubirArchivoAzure(outputFilePath);
             }
         }
-
 
         private bool HayMicrofonosDisponibles()
         {
@@ -202,9 +256,9 @@ namespace grabar_voz
 
             try
             {
-                //crear cliente de blob
+                // Crear cliente de blob
                 BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-                //crear el contenedor
+                // Crear el contenedor
                 BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
                 await containerClient.CreateIfNotExistsAsync();
@@ -213,7 +267,7 @@ namespace grabar_voz
                 string blobName = Path.GetFileName(rutaArchivo);
                 BlobClient blobClient = containerClient.GetBlobClient(blobName);
 
-                //Subir archivos
+                // Subir archivo
                 using (FileStream uploadFileStream = File.OpenRead(rutaArchivo))
                 {
                     await blobClient.UploadAsync(uploadFileStream, overwrite: true);
@@ -222,7 +276,8 @@ namespace grabar_voz
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al subir archivo a Azure: {ex.Message}");
+                //MessageBox.Show($"Error al subir archivo a Azure: {ex.Message}");
+                Console.WriteLine(ex);
             }
         }
     }
