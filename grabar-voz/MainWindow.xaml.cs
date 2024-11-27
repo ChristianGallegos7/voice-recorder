@@ -23,7 +23,7 @@ namespace grabar_voz
         {
             InitializeComponent();
             ConfigurarTimer();
-            MostrarDispositivosDeAudio();
+            //MostrarDispositivosDeAudio();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -128,14 +128,14 @@ namespace grabar_voz
         }
 
         // Método adicional para mostrar dispositivos de audio disponibles
-        private void MostrarDispositivosDeAudio()
-        {
-            for (int i = 0; i < WaveInEvent.DeviceCount; i++)
-            {
-                var capabilities = WaveInEvent.GetCapabilities(i);
-                MessageBox.Show($"Dispositivo {i}: {capabilities.ProductName}");
-            }
-        }
+        //private void MostrarDispositivosDeAudio()
+        //{
+        //    for (int i = 0; i < WaveInEvent.DeviceCount; i++)
+        //    {
+        //        var capabilities = WaveInEvent.GetCapabilities(i);
+        //        MessageBox.Show($"Dispositivo {i}: {capabilities.ProductName}");
+        //    }
+        //}
 
         public async Task SubirArchivoAzure(string rutaArchivo)
         {
@@ -173,7 +173,7 @@ namespace grabar_voz
         {
             if (isRecording && !isPaused)
             {
-                waveIn.StopRecording(); // Pausar grabación
+                waveIn.StopRecording(); // Pausar grabación6
                 timer.Stop(); // Detener el temporizador
                 isPaused = true;
                 UpdateButtonStates();
@@ -194,7 +194,7 @@ namespace grabar_voz
             StartRecording.IsEnabled = !isRecording; // Desactivar al grabar
             PauseRecording.IsEnabled = isRecording; // Activar al grabar
             StopRecording.IsEnabled = isRecording; // Activar al grabar
-            PauseRecording.Content = isPaused ? "Reanudar" : "Pausar"; // Cambiar texto
         }
+
     }
 }
