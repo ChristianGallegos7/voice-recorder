@@ -89,17 +89,27 @@ namespace grabar_voz
 
         private async void WaveIn_RecordingStopped(object sender, StoppedEventArgs e)
         {
-            if (isStopped) // Solo guardar si se ha detenido la grabación
+            try
             {
-                writer?.Dispose();
-                waveIn?.Dispose();
-                MessageBox.Show($"Grabación guardada en: {outputFilePath}");
+                if (isStopped) // Solo guardar si se ha detenido la grabación
+                {
+                    writer?.Dispose();
+                    waveIn?.Dispose();
+                    outputFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\Grabacion_{DateTime.Now:yyyyMMdd_HHmmss}.wav";
+                    MessageBox.Show($"Guardando archivo en: {outputFilePath}");
 
-                // Subir a Azure
-                await SubirArchivoAzure(outputFilePath);
-                isStopped = false; // Resetear la bandera
+
+                    // Subir a Azure
+                    await SubirArchivoAzure(outputFilePath);
+                    isStopped = false; // Resetear la bandera
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error en WaveIn_RecordingStopped: {ex.Message}");
             }
         }
+
 
         private void PauseRecording_Click(object sender, RoutedEventArgs e)
         {
@@ -167,6 +177,9 @@ namespace grabar_voz
                 isStopped = true; // Marcar como detenido
                 UpdateButtonStates();
 
+                // Asegurarse de que la grabación se haya detenido
+                MessageBox.Show("Grabación detenida. Guardando...");
+
                 // Guardar y subir el archivo
                 writer?.Dispose();
                 waveIn?.Dispose();
@@ -174,6 +187,7 @@ namespace grabar_voz
                 await SubirArchivoAzure(outputFilePath);
             }
         }
+
 
         private bool HayMicrofonosDisponibles()
         {
