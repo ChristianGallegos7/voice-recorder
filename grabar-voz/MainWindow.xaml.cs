@@ -145,16 +145,17 @@ namespace grabar_voz
         {
             try
             {
-                if (isStopped) // Solo guardar si se ha detenido la grabación
+                writer?.Dispose();
+                waveIn?.Dispose();
+
+                if (isStopped) // Solo si el usuario hizo clic en "Stop"
                 {
-                    writer?.Dispose();
-                    waveIn?.Dispose();
-                    outputFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\Grabacion_{DateTime.Now:yyyyMMdd_HHmmss}.wav";
                     MessageBox.Show($"Guardando archivo en: {outputFilePath}");
 
                     // Subir a Azure
                     await SubirArchivoAzure(outputFilePath);
-                    isStopped = false; // Resetear la bandera
+
+                    isStopped = false; // Resetear la bandera después de subir
                 }
             }
             catch (Exception ex)
@@ -162,6 +163,8 @@ namespace grabar_voz
                 MessageBox.Show($"Error en WaveIn_RecordingStopped: {ex.Message}");
             }
         }
+
+
 
         private void PauseRecording_Click(object sender, RoutedEventArgs e)
         {
@@ -193,7 +196,13 @@ namespace grabar_voz
             {
                 waveIn = new WaveInEvent();
                 waveIn.WaveFormat = new WaveFormat(44100, 1); // 44.1 kHz, mono
-                outputFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\Grabacion_{DateTime.Now:yyyyMMdd_HHmmss}.wav";
+
+                // Generar el nombre del archivo una vez
+                if (string.IsNullOrEmpty(outputFilePath)) // Solo si no ha sido definido
+                {
+                    outputFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\Grabacion_{DateTime.Now:yyyyMMdd_HHmmss}.wav";
+                }
+
                 writer = new WaveFileWriter(outputFilePath, waveIn.WaveFormat);
                 waveIn.DataAvailable += WaveIn_DataAvailable;
                 waveIn.RecordingStopped += WaveIn_RecordingStopped;
@@ -219,6 +228,7 @@ namespace grabar_voz
                 MessageBox.Show($"Error al iniciar grabación: {ex.Message}");
             }
         }
+
 
         private async void StopRecording_Click(object sender, RoutedEventArgs e)
         {
