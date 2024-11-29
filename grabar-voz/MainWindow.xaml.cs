@@ -153,7 +153,7 @@ namespace grabar_voz
                     MessageBox.Show($"Guardando archivo en: {outputFilePath}");
 
                     // Subir a Azure
-                    await SubirArchivoAzure(outputFilePath);
+                    //await SubirArchivoAzure(outputFilePath);
 
                     isStopped = false; // Resetear la bandera después de subir
                 }
@@ -223,7 +223,7 @@ namespace grabar_voz
             }
             else
             {
-                MessageBox.Show("Grabación cancelada por el usuario.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Grabación cancelada.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
@@ -257,36 +257,36 @@ namespace grabar_voz
             return WaveInEvent.DeviceCount > 0;
         }
 
-        public async Task SubirArchivoAzure(string rutaArchivo)
-        {
-            string connectionString = "DefaultEndpointsProtocol=https;AccountName=mi-cuenta;AccountKey=mi-clave;EndpointSuffix=core.windows.net";
-            string containerName = "grabaciones";
+        //public async Task SubirArchivoAzure(string rutaArchivo)
+        //{
+        //    string connectionString = "DefaultEndpointsProtocol=https;AccountName=mi-cuenta;AccountKey=mi-clave;EndpointSuffix=core.windows.net";
+        //    string containerName = "grabaciones";
 
-            try
-            {
-                // Crear cliente de blob
-                BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
-                // Crear el contenedor
-                BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+        //    try
+        //    {
+        //        // Crear cliente de blob
+        //        BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+        //        // Crear el contenedor
+        //        BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
-                await containerClient.CreateIfNotExistsAsync();
+        //        await containerClient.CreateIfNotExistsAsync();
 
-                // Nombre del blob
-                string blobName = Path.GetFileName(rutaArchivo);
-                BlobClient blobClient = containerClient.GetBlobClient(blobName);
+        //        // Nombre del blob
+        //        string blobName = Path.GetFileName(rutaArchivo);
+        //        BlobClient blobClient = containerClient.GetBlobClient(blobName);
 
-                // Subir archivo
-                using (FileStream uploadFileStream = File.OpenRead(rutaArchivo))
-                {
-                    await blobClient.UploadAsync(uploadFileStream, overwrite: true);
-                }
+        //        // Subir archivo
+        //        using (FileStream uploadFileStream = File.OpenRead(rutaArchivo))
+        //        {
+        //            await blobClient.UploadAsync(uploadFileStream, overwrite: true);
+        //        }
 
-            }
-            catch (Exception ex)
-            {
-                //MessageBox.Show($"Error al subir archivo a Azure: {ex.Message}");
-                Console.WriteLine(ex);
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //MessageBox.Show($"Error al subir archivo a Azure: {ex.Message}");
+        //        Console.WriteLine(ex);
+        //    }
+        //}
     }
 }
