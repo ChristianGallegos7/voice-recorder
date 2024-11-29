@@ -64,9 +64,32 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="StopButtonStyle" BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+            <Setter Property="Background" Value="#D32F2F"/>
+            <!-- Rojo -->
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#B71C1C"/>
+                    <!-- Rojo más oscuro al pasar el mouse -->
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#880E4F"/>
+                    <!-- Rojo aún más oscuro al presionar -->
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#212121"/>
+                    <!-- Gris cuando está deshabilitado -->
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="11*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
         <!-- Define tres filas -->
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
@@ -75,12 +98,12 @@
         </Grid.RowDefinitions>
 
         <!-- Temporizador en la parte superior -->
-        <TextBlock Name="TimerTextBlock" Grid.Row="0"
+        <TextBlock Name="TimerTextBlock"
                    Text="00:00"
-                   Style="{StaticResource TimerStyle}"/>
+                   Style="{StaticResource TimerStyle}" HorizontalAlignment="Left" Margin="127,0,0,0"/>
 
         <!-- Botones en el centro -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Margin="0,0,0,5">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Margin="60,0,0,0">
             <Button Name="PauseRecording"
                     Click="PauseRecording_Click" 
                     Style="{StaticResource ButtonStyle}"
@@ -94,13 +117,12 @@
             </Button>
             <Button Name="StopRecording"
                     Click="StopRecording_Click" 
-                    Style="{StaticResource ButtonStyle}">
+                    Style="{StaticResource StopButtonStyle}">
                 <Image Source="/detener.png" Stretch="Uniform" Width="20" Height="20"/>
             </Button>
         </StackPanel>
 
         <!-- Spectrum en la parte inferior -->
-        <Canvas Name="SpectrumCanvas" Grid.Row="2" Height="10" Margin="5,5,5,5"/>
-
+        <Canvas Name="SpectrumCanvas" Grid.Row="2" Height="10" Margin="5,5,5,5" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>

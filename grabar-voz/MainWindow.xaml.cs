@@ -131,7 +131,7 @@ namespace grabar_voz
                     double height = Math.Min(magnitudes[i], 20); // Limitar la altura para no sobrecargar la UI
                     var rect = new System.Windows.Shapes.Rectangle
                     {
-                        Width = 2,
+                        Width = 8,
                         Height = 2,
                         Fill = System.Windows.Media.Brushes.Green
                     };
@@ -163,7 +163,6 @@ namespace grabar_voz
                 MessageBox.Show($"Error en WaveIn_RecordingStopped: {ex.Message}");
             }
         }
-
 
 
         private void PauseRecording_Click(object sender, RoutedEventArgs e)
@@ -228,8 +227,7 @@ namespace grabar_voz
                 MessageBox.Show($"Error al iniciar grabación: {ex.Message}");
             }
         }
-
-
+        
         private async void StopRecording_Click(object sender, RoutedEventArgs e)
         {
             if (isRecording || isPaused) // Si está grabando o pausado
