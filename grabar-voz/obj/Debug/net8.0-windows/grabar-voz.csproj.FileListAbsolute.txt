@@ -34,3 +34,10 @@ C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\obj\Debug\net8.0-windows\g
 C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\obj\Debug\net8.0-windows\grabar-voz.genruntimeconfig.cache
 C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\obj\Debug\net8.0-windows\ref\grabar-voz.dll
 C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\obj\Debug\net8.0-windows\grabar-voz.sourcelink.json
+C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\bin\Debug\net8.0-windows\System.Data.SQLite.dll
+C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\bin\Debug\net8.0-windows\runtimes\linux-x64\native\SQLite.Interop.dll
+C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\bin\Debug\net8.0-windows\runtimes\osx-x64\native\SQLite.Interop.dll
+C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\bin\Debug\net8.0-windows\runtimes\win-x64\native\SQLite.Interop.dll
+C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\bin\Debug\net8.0-windows\runtimes\win-x86\native\SQLite.Interop.dll
+C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\obj\Debug\net8.0-windows\ClientInfoWindow.baml
+C:\Users\cgallegos\source\repos\grabar-voz\grabar-voz\obj\Debug\net8.0-windows\ClientInfoWindow.g.cs

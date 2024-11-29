@@ -3,8 +3,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using Azure.Storage.Blobs;
+using grabar_voz.Config;
 using NAudio.Dsp;
 using NAudio.Wave;
+
 
 namespace grabar_voz
 {
@@ -25,6 +27,7 @@ namespace grabar_voz
         public MainWindow()
         {
             InitializeComponent();
+            DatabaseHelper.InitializeDatabase();
             ConfigurarTimer();
             fftBuffer = new Complex[fftSize];
 
@@ -164,7 +167,6 @@ namespace grabar_voz
             }
         }
 
-
         private void PauseRecording_Click(object sender, RoutedEventArgs e)
         {
             if (isRecording && !isPaused) // Si está grabando y no pausado
@@ -184,50 +186,50 @@ namespace grabar_voz
 
         private void StartRecording_Click(object sender, RoutedEventArgs e)
         {
-            if (!HayMicrofonosDisponibles())
+            var clientWindow = new ClientInfoWindow
             {
-                MessageBox.Show("No se detectaron micrófonos. Conecte un micrófono e intente nuevamente.",
-                    "Error de dispositivo", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+                Owner = this // Asigna el propietario para que el modal bloquee la ventana principal
+            };
 
-            try
+            if (clientWindow.ShowDialog() == true)
             {
-                waveIn = new WaveInEvent();
-                waveIn.WaveFormat = new WaveFormat(44100, 1); // 44.1 kHz, mono
+                // Guardar datos del cliente en la base de datos
+                DatabaseHelper.SaveClient(clientWindow.ClientId, clientWindow.ClientName, clientWindow.Observation);
+                MessageBox.Show("Datos del cliente guardados correctamente.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Generar el nombre del archivo una vez
-                if (string.IsNullOrEmpty(outputFilePath)) // Solo si no ha sido definido
+                // Continuar con la grabación
+                try
                 {
+                    waveIn = new WaveInEvent();
+                    waveIn.WaveFormat = new WaveFormat(44100, 1); // 44.1 kHz, mono
+
                     outputFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\Grabacion_{DateTime.Now:yyyyMMdd_HHmmss}.wav";
-                }
 
-                writer = new WaveFileWriter(outputFilePath, waveIn.WaveFormat);
-                waveIn.DataAvailable += WaveIn_DataAvailable;
-                waveIn.RecordingStopped += WaveIn_RecordingStopped;
-                waveIn.StartRecording();
+                    writer = new WaveFileWriter(outputFilePath, waveIn.WaveFormat);
+                    waveIn.DataAvailable += WaveIn_DataAvailable;
+                    waveIn.RecordingStopped += WaveIn_RecordingStopped;
+                    waveIn.StartRecording();
 
-                // Inicializar el buffer FFT
-                fftBuffer = new Complex[fftSize];
-
-                if (!isPaused) // Solo reiniciar el tiempo si no se está reanudando
-                {
                     elapsedTime = TimeSpan.Zero;
                     TimerTextBlock.Text = "00:00";
-                }
-                timer.Start();
+                    timer.Start();
 
-                isRecording = true;
-                isPaused = false;
-                isStopped = false;
-                UpdateButtonStates();
+                    isRecording = true;
+                    isPaused = false;
+                    isStopped = false;
+                    UpdateButtonStates();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al iniciar grabación: {ex.Message}");
+                }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error al iniciar grabación: {ex.Message}");
+                MessageBox.Show("Grabación cancelada por el usuario.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-        
+
         private async void StopRecording_Click(object sender, RoutedEventArgs e)
         {
             if (isRecording || isPaused) // Si está grabando o pausado

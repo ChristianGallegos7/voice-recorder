@@ -1,0 +1,38 @@
+﻿<Window x:Class="grabar_voz.ClientInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Información del Cliente" 
+        Height="250" Width="400"
+        WindowStartupLocation="CenterOwner" 
+        ResizeMode="NoResize">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Identificación -->
+        <Label Content="Identificación:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
+        <TextBox x:Name="IdTextBox" Grid.Row="0" Grid.Column="1" Margin="5" VerticalAlignment="Center"/>
+
+        <!-- Nombre -->
+        <Label Content="Nombre:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
+        <TextBox x:Name="NameTextBox" Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center"/>
+
+        <!-- Observaciones -->
+        <Label Content="Observaciones:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,5"/>
+        <TextBox x:Name="ObservationTextBox" Grid.Row="2" Grid.Column="1" Margin="5" VerticalAlignment="Center"/>
+
+        <!-- Botones -->
+        <StackPanel Orientation="Horizontal" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="5">
+            <Button Content="Aceptar" Width="80" Margin="5" Name="AcceptButton" Click="AcceptButton_Click"/>
+            <Button Content="Cancelar" Width="80" Margin="5" Name="CancelButton" Click="CancelButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
