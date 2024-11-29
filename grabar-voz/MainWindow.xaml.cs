@@ -3,10 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using Azure.Storage.Blobs;
-using grabar_voz.Config;
 using NAudio.Dsp;
 using NAudio.Wave;
-
 
 namespace grabar_voz
 {
@@ -27,7 +25,6 @@ namespace grabar_voz
         public MainWindow()
         {
             InitializeComponent();
-            DatabaseHelper.InitializeDatabase();
             ConfigurarTimer();
             fftBuffer = new Complex[fftSize];
 
@@ -167,6 +164,7 @@ namespace grabar_voz
             }
         }
 
+
         private void PauseRecording_Click(object sender, RoutedEventArgs e)
         {
             if (isRecording && !isPaused) // Si está grabando y no pausado
@@ -194,7 +192,6 @@ namespace grabar_voz
             if (clientWindow.ShowDialog() == true)
             {
                 // Guardar datos del cliente en la base de datos
-                DatabaseHelper.SaveClient(clientWindow.ClientId, clientWindow.ClientName, clientWindow.Observation);
                 MessageBox.Show("Datos del cliente guardados correctamente.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 // Continuar con la grabación
@@ -229,6 +226,7 @@ namespace grabar_voz
                 MessageBox.Show("Grabación cancelada por el usuario.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+
 
         private async void StopRecording_Click(object sender, RoutedEventArgs e)
         {
